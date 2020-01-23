@@ -1,0 +1,581 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[248]:
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+get_ipython().magic(u'matplotlib inline')
+import seaborn as sns
+
+
+# In[249]:
+
+
+stationary = " Lidar 1 range(mm): 154  Lidar 2 range(mm): 132 5835 Heading: 5.32 Radians    304.73 Degrees    Magnetometer readings: Mx:-137 My:87 Lidar 1 range(mm): 148  Lidar 2 range(mm): 127 5836 Heading: 5.34 Radians    305.91 Degrees    Magnetometer readings: Mx:-137 My:91 Lidar 1 range(mm): 146  Lidar 2 range(mm): 136 5837 Heading: 5.31 Radians    304.36 Degrees    Magnetometer readings: Mx:-139 My:87 Lidar 1 range(mm): 143  Lidar 2 range(mm): 126 5838 Heading: 5.32 Radians    304.84 Degrees    Magnetometer readings: Mx:-138 My:88 Lidar 1 range(mm): 156  Lidar 2 range(mm): 121 5839 Heading: 5.32 Radians    304.65 Degrees    Magnetometer readings: Mx:-139 My:88 Lidar 1 range(mm): 159  Lidar 2 range(mm): 120 5840 Heading: 5.32 Radians    304.95 Degrees    Magnetometer readings: Mx:-139 My:89 Lidar 1 range(mm): 166  Lidar 2 range(mm): 110 5841 Heading: 5.33 Radians    305.62 Degrees    Magnetometer readings: Mx:-137 My:90 Lidar 1 range(mm): 172  Lidar 2 range(mm): 1135 842 Heading: 5.32 Radians    304.81 Degrees    Magnetometer readings: Mx:-135 My:86 Lidar 1 range(mm): 182  Lidar 2 range(mm): 108 5843 Heading: 5.32 Radians    304.70 Degrees    Magnetometer readings: Mx:-134 My:85 Lidar 1 range(mm): 192  Lidar 2 range(mm): 106 5844 Heading: 5.33 Radians    305.40 Degrees    Magnetometer readings: Mx:-132 My:86 Lidar 1 range(mm): 190  Lidar 2 range(mm): 99 5845 Heading: 5.32 Radians    304.70 Degrees    Magnetometer readings: Mx:-134 My:85 Lidar 1 range(mm): 178  Lidar 2 range(mm): 103 5846 Heading: 5.31 Radians    304.48 Degrees    Magnetometer readings: Mx:-132 My:83 Lidar 1 range(mm): 189  Lidar 2 range(mm): 96 5847 Heading: 5.31 Radians    304.40 Degrees    Magnetometer readings: Mx:-134 My:84 Lidar 1 range(mm): 211  Lidar 2 range(mm): 88 5848 Heading: 5.32 Radians    304.90 Degrees    Magnetometer readings: Mx:-133 My:85 Lidar 1 range(mm): 227  Lidar 2 range(mm): 95 5849 Heading: 5.32 Radians    304.67 Degrees    Magnetometer readings: Mx:-131 My:83 Lidar 1 range(mm): 237  Lidar 2 range(mm): 88 5850 Heading: 5.33 Radians    305.29 Degrees    Magnetometer readings: Mx:-131 My:85 Lidar 1 range(mm): 245  Lidar 2 range(mm): 96 5851 Heading: 5.32 Radians    304.79 Degrees    Magnetometer readings: Mx:-132 My:84 Lidar 1 range(mm): 237  Lidar 2 range(mm): 103 5852 Heading: 5.33 Radians    305.29 Degrees    Magnetometer readings: Mx:-131 My:85 Lidar 1 range(mm): 245  Lidar 2 range(mm): 78 5853 Heading: 5.31 Radians    303.97 Degrees    Magnetometer readings: Mx:-133 My:82 Lidar 1 range(mm): 246  Lidar 2 range(mm): 85"
+
+FD_backward = ' 5854  Heading: 5.31 Radians    304.04 Degrees     Magnetometer readings: Mx:-131 My:81  Lidar 1 range(mm): 282  Lidar 2 range(mm): 90 5855  Heading: 5.31 Radians    304.16 Degrees     Magnetometer readings: Mx:-132 My:82  Lidar 1 range(mm): 309  Lidar 2 range(mm): 102 5856  Heading: 5.34 Radians    306.00 Degrees     Magnetometer readings: Mx:-129 My:86  Lidar 1 range(mm): 283  Lidar 2 range(mm): 101 5857  Heading: 5.35 Radians    306.31 Degrees     Magnetometer readings: Mx:-129 My:87  Lidar 1 range(mm): 314  Lidar 2 range(mm): 102 5858  Heading: 5.36 Radians    306.92 Degrees     Magnetometer readings: Mx:-129 My:89  Lidar 1 range(mm): 359  Lidar 2 range(mm): 92 5859  Heading: 5.35 Radians    306.71 Degrees     Magnetometer readings: Mx:-130 My:89  Lidar 1 range(mm): 360  Lidar 2 range(mm): 91 5860  Heading: 5.36 Radians    307.25 Degrees     Magnetometer readings: Mx:-126 My:88  Lidar 1 range(mm): 336  Lidar 2 range(mm): 87 5861  Heading: 5.36 Radians    307.22 Degrees     Magnetometer readings: Mx:-129 My:90  Lidar 1 range(mm): 319  Lidar 2 range(mm): 94 5862  Heading: 5.37 Radians    307.73 Degrees     Magnetometer readings: Mx:-128 My:91  Lidar 1 range(mm): 318  Lidar 2 range(mm): 66 5863  Heading: 5.37 Radians    307.55 Degrees     Magnetometer readings: Mx:-126 My:89  Lidar 1 range(mm): 314  Lidar 2 range(mm): 111'
+
+stop = ' 5864  Heading: 5.39 Radians    308.75 Degrees     Magnetometer readings: Mx:-126 My:93  Lidar 1 range(mm): 315  Lidar 2 range(mm): 97 5865  Heading: 5.37 Radians    307.55 Degrees     Magnetometer readings: Mx:-126 My:89  Lidar 1 range(mm): 311  Lidar 2 range(mm): 88'
+
+BK_forward = ' 5866  Heading: 5.36 Radians    306.94 Degrees     Magnetometer readings: Mx:-126 My:87  Lidar 1 range(mm): 308  Lidar 2 range(mm): 84 5867  Heading: 5.37 Radians    307.64 Degrees     Magnetometer readings: Mx:-127 My:90  Lidar 1 range(mm): 315  Lidar 2 range(mm): 85 5868  Heading: 5.37 Radians    307.64 Degrees     Magnetometer readings: Mx:-127 My:90  Lidar 1 range(mm): 328  Lidar 2 range(mm): 102 5869  Heading: 5.37 Radians    307.43 Degrees     Magnetometer readings: Mx:-128 My:90  Lidar 1 range(mm): 330  Lidar 2 range(mm): 81 5870  Heading: 5.37 Radians    307.43 Degrees     Magnetometer readings: Mx:-128 My:90  Lidar 1 range(mm): 336  Lidar 2 range(mm): 95 5871  Heading: 5.35 Radians    306.31 Degrees     Magnetometer readings: Mx:-129 My:87  Lidar 1 range(mm): 346  Lidar 2 range(mm): 113 5872  Heading: 5.36 Radians    307.03 Degrees     Magnetometer readings: Mx:-127 My:88  Lidar 1 range(mm): 343  Lidar 2 range(mm): 95 5873  Heading: 5.35 Radians    306.53 Degrees     Magnetometer readings: Mx:-125 My:85  Lidar 1 range(mm): 354  Lidar 2 range(mm): 95 5874  Heading: 5.34 Radians    305.90 Degrees     Magnetometer readings: Mx:-128 My:85  Lidar 1 range(mm): 366  Lidar 2 range(mm): 97 5875  Heading: 5.34 Radians    306.21 Degrees     Magnetometer readings: Mx:-128 My:86  Lidar 1 range(mm): 383  Lidar 2 range(mm): 95 5876  Heading: 5.33 Radians    305.18 Degrees     Magnetometer readings: Mx:-130 My:84  Lidar 1 range(mm): 399  Lidar 2 range(mm): 99'
+        
+zero_stop = ' 5877 Heading: 5.32 Radians    305.07 Degrees     Magnetometer readings: Mx:-129 My:83  Lidar 1 range(mm): 423  Lidar 2 range(mm): 87'
+
+LT_right = ' 5878  Heading: 5.32 Radians    304.56 Degrees     Magnetometer readings: Mx:-130 My:82  Lidar 1 range(mm): 420  Lidar 2 range(mm): 105 5879  Heading: 5.32 Radians    304.96 Degrees     Magnetometer readings: Mx:-128 My:82  Lidar 1 range(mm): 472  Lidar 2 range(mm): 103 5880  Heading: 5.31 Radians    304.40 Degrees     Magnetometer readings: Mx:-134 My:84  Lidar 1 range(mm): 452  Lidar 2 range(mm): 90 5881  Heading: 5.30 Radians    303.58 Degrees     Magnetometer readings: Mx:-140 My:85  Lidar 1 range(mm): 382  Lidar 2 range(mm): 142 5882  Heading: 5.30 Radians    303.40 Degrees     Magnetometer readings: Mx:-141 My:85  Lidar 1 range(mm): 291  Lidar 2 range(mm): 314 5883  Heading: 5.26 Radians    301.64 Degrees     Magnetometer readings: Mx:-146 My:82  Lidar 1 range(mm): 322  Lidar 2 range(mm): 349 5884  Heading: 5.25 Radians    300.84 Degrees     Magnetometer readings: Mx:-149 My:81  Lidar 1 range(mm): 445  Lidar 2 range(mm): 381 5885  Heading: 5.24 Radians    300.23 Degrees     Magnetometer readings: Mx:-151 My:80  Lidar 1 range(mm): 426  Lidar 2 range(mm): 426 5886  Heading: 5.21 Radians    298.43 Degrees     Magnetometer readings: Mx:-155 My:76  Lidar 1 range(mm): 379  Lidar 2 range(mm): 455 5887  Heading: 5.20 Radians    298.15 Degrees     Magnetometer readings: Mx:-157 My:76  Lidar 1 range(mm): 353  Lidar 2 range(mm): 451 5888  Heading: 5.16 Radians    295.77 Degrees     Magnetometer readings: Mx:-159 My:69  Lidar 1 range(mm): 361  Lidar 2 range(mm): 456'
+        
+        
+# On connection #0
+#   got text: #0
+zero_sero_stop = ' 5889  Heading: 5.15 Radians    294.91 Degrees     Magnetometer readings: Mx:-161 My:67  Lidar 1 range(mm): 355  Lidar 2 range(mm): 455 5890  Heading: 5.14 Radians    294.42 Degrees     Magnetometer readings: Mx:-160 My:65  Lidar 1 range(mm): 356  Lidar 2 range(mm): 455'
+        
+        
+zero_dr = ' 5891  Heading: 5.13 Radians    293.86 Degrees     Magnetometer readings: Mx:-157 My:62  Lidar 1 range(mm): 355  Lidar 2 range(mm): 454 5892  Heading: 5.13 Radians    293.69 Degrees     Magnetometer readings: Mx:-161 My:63  Lidar 1 range(mm): 359  Lidar 2 range(mm): 453 5893  Heading: 5.13 Radians    293.87 Degrees     Magnetometer readings: Mx:-162 My:64  Lidar 1 range(mm): 352  Lidar 2 range(mm): 400 5894  Heading: 5.12 Radians    293.45 Degrees     Magnetometer readings: Mx:-163 My:63  Lidar 1 range(mm): 353  Lidar 2 range(mm): 392'
+
+stop3 = ' 5895  Heading: 5.12 Radians    293.57 Degrees     Magnetometer readings: Mx:-162 My:63  Lidar 1 range(mm): 354  Lidar 2 range(mm): 413 5896  Heading: 5.13 Radians    293.69 Degrees     Magnetometer readings: Mx:-161 My:63  Lidar 1 range(mm): 353  Lidar 2 range(mm): 413 5897  Heading: 5.15 Radians    295.12 Degrees     Magnetometer readings: Mx:-157 My:66  Lidar 1 range(mm): 355  Lidar 2 range(mm): 411'
+
+RT_left =' 5898  Heading: 5.11 Radians    292.64 Degrees     Magnetometer readings: Mx:-162 My:60  Lidar 1 range(mm): 347  Lidar 2 range(mm): 444'
+        
+stop4 = ' 5899  Heading: 5.12 Radians    293.50 Degrees     Magnetometer readings: Mx:-160 My:62  Lidar 1 range(mm): 382  Lidar 2 range(mm): 452'
+        
+
+RT_left2 = ' 5900  Heading: 5.19 Radians    297.25 Degrees     Magnetometer readings: Mx:-157 My:73  Lidar 1 range(mm): 401  Lidar 2 range(mm): 410 5901  Heading: 5.21 Radians    298.45 Degrees     Magnetometer readings: Mx:-161 My:79  Lidar 1 range(mm): 411  Lidar 2 range(mm): 332 5902  Heading: 5.23 Radians    299.46 Degrees     Magnetometer readings: Mx:-156 My:80  Lidar 1 range(mm): 302  Lidar 2 range(mm): 98 5903  Heading: 5.26 Radians    301.56 Degrees     Magnetometer readings: Mx:-150 My:84  Lidar 1 range(mm): 395  Lidar 2 range(mm): 112 5904  Heading: 5.30 Radians    303.74 Degrees     Magnetometer readings: Mx:-144 My:88  Lidar 1 range(mm): 445  Lidar 2 range(mm): 90 5905  Heading: 5.30 Radians    303.52 Degrees     Magnetometer readings: Mx:-142 My:86  Lidar 1 range(mm): 445  Lidar 2 range(mm): 86 5906  Heading: 5.34 Radians    306.20 Degrees     Magnetometer readings: Mx:-134 My:90  Lidar 1 range(mm): 451  Lidar 2 range(mm): 103 5907  Heading: 5.34 Radians    305.90 Degrees     Magnetometer readings: Mx:-128 My:85  Lidar 1 range(mm): 410  Lidar 2 range(mm): 83 5908  Heading: 5.35 Radians    306.74 Degrees     Magnetometer readings: Mx:-124 My:85  Lidar 1 range(mm): 391  Lidar 2 range(mm): 85 5909  Heading: 5.36 Radians    306.86 Degrees     Magnetometer readings: Mx:-122 My:84  Lidar 1 range(mm): 372  Lidar 2 range(mm): 93 5910  Heading: 5.36 Radians    307.11 Degrees     Magnetometer readings: Mx:-118 My:82  Lidar 1 range(mm): 363  Lidar 2 range(mm): 175 5911  Heading: 5.34 Radians    306.23 Degrees     Magnetometer readings: Mx:-119 My:80  Lidar 1 range(mm): 267  Lidar 2 range(mm): 122 5912  Heading: 5.34 Radians    305.77 Degrees     Magnetometer readings: Mx:-115 My:76  Lidar 1 range(mm): 247  Lidar 2 range(mm): 111 5913  Heading: 5.35 Radians    306.59 Degrees     Magnetometer readings: Mx:-113 My:77  Lidar 1 range(mm): 194  Lidar 2 range(mm): 74 5914  Heading: 5.33 Radians    305.66 Degrees     Magnetometer readings: Mx:-114 My:75  Lidar 1 range(mm): 179  Lidar 2 range(mm): 96 5915  Heading: 5.32 Radians    305.05 Degrees     Magnetometer readings: Mx:-112 My:72  Lidar 1 range(mm): 163  Lidar 2 range(mm): 194 5916  Heading: 5.30 Radians    303.87 Degrees     Magnetometer readings: Mx:-114 My:70  Lidar 1 range(mm): 132  Lidar 2 range(mm): 209 5917  Heading: 5.32 Radians    304.55 Degrees     Magnetometer readings: Mx:-111 My:70  Lidar 1 range(mm): 138  Lidar 2 range(mm): 254 5918  Heading: 5.28 Radians    302.38 Degrees     Magnetometer readings: Mx:-114 My:66  Lidar 1 range(mm): 8191  Lidar 2 range(mm): 464 5919  Heading: 5.31 Radians    304.41 Degrees     Magnetometer readings: Mx:-110 My:69  Lidar 1 range(mm): 131  Lidar 2 range(mm): 554 5920  Heading: 5.30 Radians    303.43 Degrees     Magnetometer readings: Mx:-111 My:67  Lidar 1 range(mm): 104  Lidar 2 range(mm): 590 5921  Heading: 5.27 Radians    302.06 Degrees     Magnetometer readings: Mx:-112 My:64  Lidar 1 range(mm): 87  Lidar 2 range(mm): 589 5922  Heading: 5.26 Radians    301.50 Degrees     Magnetometer readings: Mx:-111 My:62  Lidar 1 range(mm): 61  Lidar 2 range(mm): 592'
+
+        
+stop5 =' 5923  Heading: 5.24 Radians    300.47 Degrees     Magnetometer readings: Mx:-114 My:61  Lidar 1 range(mm): 60  Lidar 2 range(mm): 600 5924  Heading: 5.24 Radians    300.28 Degrees     Magnetometer readings: Mx:-113 My:60  Lidar 1 range(mm): 56  Lidar 2 range(mm): 597 5925  Heading: 5.22 Radians    299.27 Degrees     Magnetometer readings: Mx:-116 My:59  Lidar 1 range(mm): 47  Lidar 2 range(mm): 597 5926  Heading: 5.22 Radians    299.08 Degrees     Magnetometer readings: Mx:-117 My:59  Lidar 1 range(mm): 48  Lidar 2 range(mm): 610 5927  Heading: 5.22 Radians    298.88 Degrees     Magnetometer readings: Mx:-118 My:59  Lidar 1 range(mm): 41  Lidar 2 range(mm): 626 5928  Heading: 5.22 Radians    299.08 Degrees     Magnetometer readings: Mx:-117 My:59  Lidar 1 range(mm): 49  Lidar 2 range(mm): 628 5929  Heading: 5.21 Radians    298.68 Degrees     Magnetometer readings: Mx:-117 My:58  Lidar 1 range(mm): 48  Lidar 2 range(mm): 648 5930  Heading: 5.22 Radians    299.08 Degrees     Magnetometer readings: Mx:-117 My:59  Lidar 1 range(mm): 49  Lidar 2 range(mm): 668 5931  Heading: 5.21 Radians    298.68 Degrees     Magnetometer readings: Mx:-117 My:58  Lidar 1 range(mm): 57  Lidar 2 range(mm): 675 5932  Heading: 5.22 Radians    299.08 Degrees     Magnetometer readings: Mx:-117 My:59  Lidar 1 range(mm): 59  Lidar 2 range(mm): 667 5933  Heading: 5.21 Radians    298.49 Degrees     Magnetometer readings: Mx:-118 My:58  Lidar 1 range(mm): 0  Lidar 2 range(mm): 661 5934  Heading: 5.22 Radians    299.28 Degrees     Magnetometer readings: Mx:-114 My:58  Lidar 1 range(mm): 0  Lidar 2 range(mm): 645 5935  Heading: 5.23 Radians    299.87 Degrees     Magnetometer readings: Mx:-115 My:60  Lidar 1 range(mm): 0  Lidar 2 range(mm): 607  5936  Heading: 5.23 Radians    299.68 Degrees     Magnetometer readings: Mx:-114 My:59  Lidar 1 range(mm): 0  Lidar 2 range(mm): 578 5937  Heading: 5.22 Radians    299.27 Degrees     Magnetometer readings: Mx:-116 My:59  Lidar 1 range(mm): 0  Lidar 2 range(mm): 574 5938  Heading: 5.22 Radians    298.88 Degrees     Magnetometer readings: Mx:-116 My:58    Lidar 1 range(mm): 0  Lidar 2 range(mm): 568 5939  Heading: 5.23 Radians    299.47 Degrees     Magnetometer readings: Mx:-115 My:59  Lidar 1 range(mm): 0  Lidar 2 range(mm): 566 5940  Heading: 5.20 Radians    297.89 Degrees     Magnetometer readings: Mx:-117 My:56  Lidar 1 range(mm): 0  Lidar 2 range(mm): 572 5941  Heading: 5.22 Radians    299.08 Degrees     Magnetometer readings: Mx:-117 My:59  Lidar 1 range(mm): 0  Lidar 2 range(mm): 571 5942  Heading: 5.21 Radians    298.68 Degrees     Magnetometer readings: Mx:-117 My:58  Lidar 1 range(mm): 0  Lidar 2 range(mm): 564 5943  Heading: 5.21 Radians    298.29 Degrees     Magnetometer readings: Mx:-117 My:57     Lidar 1 range(mm): 2  Lidar 2 range(mm): 579 5944  Heading: 5.21 Radians    298.68 Degrees     Magnetometer readings: Mx:-117 My:58  Lidar 1 range(mm): 2  Lidar 2 range(mm): 562 5945  Heading: 5.22 Radians    299.08 Degrees     Magnetometer readings: Mx:-115 My:58  Lidar 1 range(mm): 0  Lidar 2 range(mm): 464 5946  Heading: 5.21 Radians    298.48 Degrees     Magnetometer readings: Mx:-116 My:57  Lidar 1 range(mm): 0  Lidar 2 range(mm): 302 5947  Heading: 5.21 Radians    298.48 Degrees     Magnetometer readings: Mx:-116 My:57  Lidar 1 range(mm): 0  Lidar 2 range(mm): 268 5948  Heading: 5.23 Radians    299.66 Degrees     Magnetometer readings: Mx:-116 My:60  Lidar 1 range(mm): 0  Lidar 2 range(mm): 581 5949  Heading: 5.23 Radians    299.47 Degrees     Magnetometer readings: Mx:-115 My:59  Lidar 1 range(mm): 22  Lidar 2 range(mm): 594 5950  Heading: 5.22 Radians    298.88 Degrees     Magnetometer readings: Mx:-116 My:58  Lidar 1 range(mm): 60  Lidar 2 range(mm): 495 5951  Heading: 5.22 Radians    299.27 Degrees     Magnetometer readings: Mx:-116 My:59  Lidar 1 range(mm): 71  Lidar 2 range(mm): 442 5952  Heading: 5.21 Radians    298.68 Degrees     Magnetometer readings: Mx:-117 My:58  Lidar 1 range(mm): 92  Lidar 2 range(mm): 420 5953  Heading: 5.22 Radians    298.88 Degrees Magnetometer readings: Mx:-116 My:58  Lidar 1 range(mm): 64  Lidar 2 range(mm): 386 5954  Heading: 5.22 Radians    299.08 Degrees     Magnetometer readings: Mx:-115 My:58'
+
+
+# In[252]:
+
+
+import re
+allStrings = stationary + FD_backward + stop + BK_forward + zero_stop + LT_right + zero_sero_stop + zero_dr + stop3 + RT_left + stop4 + RT_left2 + stop
+
+lidar_1 = re.findall("Lidar 1 range\(mm\): \d+", allStrings)
+lid_1 = []
+for r in lidar_1:
+    lid_1 += [re.findall('\d\d+', r)]
+lid_1
+
+lidar_2 = re.findall("Lidar 2 range\(mm\): \d+", allStrings)
+lid_2 = []
+for r in lidar_2:
+    lid_2 += [re.findall('\d\d+', r)]
+
+
+len(lid_1) == len(lid_2)
+
+
+# In[253]:
+
+
+get_ipython().magic(u'matplotlib inline')
+import matplotlib.pyplot as plt
+plt.style.use('seaborn-whitegrid')
+import numpy as np
+
+
+# In[254]:
+
+
+#  DATA EXPLORATION
+
+plt.figure(figsize=(20, 11), dpi= 80, facecolor='w', edgecolor='k')
+
+x = [lid_1[i][0] for i in range(len(lid_1))]
+y = [lid_2[i][0] for i in range(len(lid_1))]
+plt.scatter(x, y, marker='o')
+plt.title("Lidar_1 vs. Lidar_2", fontsize=18)
+plt.xlabel("lid_1", fontsize=12)
+plt.ylabel("lid_2", fontsize=12)
+
+
+# In[255]:
+
+
+#  DRIVING FW --> BK --> LEFT --> RIGHT
+
+m_x = re.findall('Magnetometer readings: Mx:\S*\d+', allStrings)
+mag_x = []
+for r in m_x:
+    mag_x += [re.findall('\-*\d+', r)]
+
+    
+m_y = re.findall('My:\S*\d+', allStrings)
+mag_y = []
+for r in m_y:
+    mag_y += [re.findall('\-*\d+', r)]   
+plt.scatter(mag_x, mag_y, marker='o')
+plt.title("Magnetometer_X vs. Magnetometer_Y", fontsize=15)
+plt.xlabel("mag_x", fontsize=12)
+plt.ylabel("mag_y", fontsize=12)
+
+
+# In[256]:
+
+
+# WILL NEED THIS IN THE FUTURE FOR CALIBRATION
+
+x_center = (min(mag_x)+max(mag_x))
+y_center = (min(mag_y)+max(mag_y))
+
+x_center, y_center
+
+
+# In[260]:
+
+
+# SLOWLY ROTATING 10 degrees at a time - full circle
+df1 = pd.read_csv("IMU Data copy.csv")
+
+mag_x = df1.iloc[:, 1]
+mag_y = df1.iloc[:, 2]
+plt.scatter(mag_x, mag_y, marker='o')
+plt.title("Pure Rotation: Magnetometer_X v. Magnetometer_Y", fontsize=15)
+plt.xlabel("Mag_x")
+plt.ylabel("Mag_y")
+
+
+# In[9]:
+
+
+Q = df1.iloc[:, 0]
+angle = []
+for row in Q:
+    angle += [re.sub("\d+\\t", '', row)]
+Q.head()
+
+
+# In[10]:
+
+
+mag_x, mag_y = mag_y, mag_x
+
+
+# In[237]:
+
+
+M_PI = 3.1415
+
+yaw = 180*np.arctan2(-mag_y,mag_x)/M_PI
+plt.figure(figsize=(9, 7), dpi= 80, facecolor='w', edgecolor='k')
+plt.scatter(range(len(yaw)), yaw, marker='o')
+plt.title("YAW: Rotation Angle")
+plt.xlabel("Time step Index")
+plt.ylabel("Q")
+
+
+# "Open Loop Data Collection and Parameter Estimation"
+
+# Before trying to control the ESP8266-12E, we will first characterize the open loop reponse of the system. To make modeling easier, we will separate the models of the two wheels. The model that we create for both wheels can be identical because they are symmetric, but will have different parameters to account for subtle differences in the hardware. The distance that each wheel has moved (measured in number of TIME STEPS) at sample $k$ will be denoted using $d_L[k]$ and $d_R[k]$ for the left and right wheels respectively. The open loop model has an input $u[k]$ for PWM level and an output for the distance for that wheel (thus the $C$ matrix is just the identity matrix).
+# 
+# $$d_L[k+1] = d_L[k] + \theta_L u_L[k] - \beta_L$$
+# $$d_R[k+1] = d_R[k] + \theta_R u_R[k] - \beta_R$$
+# 
+# All distances are measured in cm (each TIME STEP corresponds to ~1cm of wheel travel) while 1 TIME STEP = 1 ms. As you can see, there are 2 unknown variables for each wheel, namely $\theta$ and $\beta$. To determine these parameters, we will perform least squares regression on each row. We will do this for both wheels separately.
+
+# Sensor Model for Constant Velocity
+# 
+# By assuming constant velocity $v_k = const$ we get:
+# $r_{k+1} = r_k + T_s * v_k$
+
+# In[12]:
+
+
+# How to use magnetometer: https://www.diva-portal.org/smash/get/diva2:606532/FULLTEXT01.pdf
+
+def rotation_matrix(yaw, index):
+    heading = yaw[index]
+    Rotat_M = [[np.cos(heading), np.sin(heading), 0],
+               [np.sin(heading), np.cos(heading), 0],
+               [0, 0, 1]]
+    return Rotat_M
+
+
+# In[236]:
+
+
+old_velocities = pd.read_csv("Lab 1 Data - Angular Velocities.csv")
+old_velocities.head()
+
+
+# In[261]:
+
+
+#  DATA CLEANING
+
+old_velocities = old_velocities.drop('Unnamed: 3', axis=1)
+old_velocities = old_velocities.rename(columns={"Left Motor": "Left Motor PWM", 
+                                                "Right Motor": "Right Motor PWM",
+                                                "Unnamed: 1": "Left Frequency",
+                                                "Unnamed: 2": "Left Period (s)",
+                                                "Unnamed: 5": "Right Frequency",
+                                                "Unnamed: 6": "Right Period (s)"})
+old_velocities = old_velocities.drop(old_velocities.index[[0]])
+old_velocities.reset_index(drop=True, inplace=True, col_level=0, col_fill='')
+old_velocities
+
+
+# In[262]:
+
+
+# pi * r^2 = circumference
+# pi * r^2 / time = speed
+pi = M_PI
+r = 2 #cm
+
+
+period_left = old_velocities["Left Period (s)"][:]
+velocity_left = [3.1415 * r*r / float(p) for p in period_left]
+pwm_left = [float(p) for p in old_velocities["Left Motor PWM"][:]]
+
+period_right = old_velocities["Right Period (s)"][0:]
+velocity_right = [3.1415 * r*r / float(p) for p in period_right]
+pwm_right = [float(p) for p in old_velocities["Right Motor PWM"][:]]
+
+
+
+t_f = [pwm_left[i]==pwm_right[i] for i in range(len(pwm_left))]
+t_f2 = [velocity_left[i]== velocity_right[i] for i in range(len(pwm_left))]
+
+old_velocities["Speed Left Wheel"], old_velocities["Speed Right Wheel"] = velocity_left, velocity_right
+old_velocities.head(10)
+
+
+# In[263]:
+
+
+plt.figure(figsize=(9, 7), dpi= 80, facecolor='w', edgecolor='k')
+plt.xlabel("u (input via PWM)", fontsize=18)
+plt.ylabel("Velocity of Wheels", fontsize=18)
+labels = ("left", "right")
+plt.plot(pwm_right, velocity_right, 'y-')
+plt.plot(pwm_left, velocity_left, 'b-')
+plt.legend(labels, loc=0)
+plt.title("LEFT v. RIGHT Wheel Speed before Calibration")
+plt.show()
+
+
+# Now that we have some data, we can try performing least squares regression. We use function `np.linalg.lstsq`  here. The problem formulation is nearly the same for both wheels, so we can write a function that takes the data as parameters, performs least squares, and extracts the parameters.
+# 
+# Record the values of $\theta$ and $\beta$ for each wheel.
+
+# In[25]:
+
+
+old_velocities.columns
+
+
+# In[216]:
+
+
+from sklearn.model_selection import train_test_split
+
+#  SPLIT DATA SELECTING RANDOM ROWS W/O REPLACEMENT
+train, test = train_test_split(old_velocities, test_size=0.3)
+
+
+# In[217]:
+
+
+#  ACTUAL DATA
+y_actual_left, y_actual_right = test["Speed Left Wheel"], test['Speed Right Wheel']
+
+# SAME for actual vs. predicted
+pwm_left, pwm_right = test['Left Motor PWM'], test['Right Motor PWM']
+
+
+# In[218]:
+
+
+"""SIMPLER MODEL WITH 2 PARAMETERS"""
+
+from sklearn.linear_model import LinearRegression
+# TRAINE DATA FOR LEFT WHEEL
+Lin_Regression_left = LinearRegression()
+left_list = ['Left Motor PWM', 'Left Period (s)']
+X_left = train.loc[:, left_list]
+y_left = train["Speed Left Wheel"]
+Lin_Regression_left.fit(X_left, y_left)
+LinearRegression(copy_X=True, fit_intercept=True, normalize=False)
+print("FOR THE LEFT WHEEL:", "Your coeffs: ", Lin_Regression_left.coef_, " And your intercept is: ", Lin_Regression_left.intercept_)
+
+# TRAIN DATA FOR RIGHT WHEEL
+Lin_Regression_right = LinearRegression()
+right_list = ['Right Motor PWM', 'Right Period (s)']
+# right_list = left_list
+X_right = train.loc[:, right_list]
+y_right = train["Speed Right Wheel"]
+Lin_Regression_right.fit(X_right, y_right)
+LinearRegression(copy_X=True, fit_intercept=True, normalize=False)
+print("FOR THE RIGHT WHEEL:", "Your coeffs: ", Lin_Regression_right.coef_, " And your intercept is: ", Lin_Regression_right.intercept_)
+
+
+#  PREDICTED TEST DATA
+y_simulated_left = Lin_Regression_left.predict(test.loc[:, left_list])
+y_simulated_right = Lin_Regression_right.predict(test.loc[:, right_list])
+len(y_actual_left) == len(y_actual_right) == len(pwm_left) == len(pwm_right) == len(y_simulated_left) == len(y_simulated_right)
+
+
+plt.plot(pwm_left, y_actual_left, 'b-', label='actual_velocity_left')
+plt.plot(pwm_left, y_simulated_left, 'b-o', label='simulated_velocity_left')
+plt.plot(pwm_right, y_actual_right, 'y-',  label='actual_velocity_right')
+plt.plot(pwm_right, y_simulated_right, 'y-^', label='simulated_velocity_right')
+plt.xlabel("PWM", fontsize=18)
+plt.ylabel("Velocity of Wheels", fontsize=18)
+plt.legend()
+plt.show()
+
+
+# In[219]:
+
+
+# Lin reg Example: https://stackoverflow.com/questions/19991445/run-an-ols-regression-with-pandas-data-frame
+
+"""MORE COMPLEX MODEL - 6 parameters"""
+
+# FOR LEFT WHEEL
+Lin_Regression_left = LinearRegression()
+full_list = ['Left Motor PWM', 'Left Frequency', 'Left Period (s)',
+             'Right Motor PWM','Right Frequency','Right Period (s)']
+X_left = train.loc[:, full_list]
+y_left = train["Speed Left Wheel"]
+Lin_Regression_left.fit(X_left, y_left)
+print("FOR THE LEFT WHEEL:", "Your coeffs: ", Lin_Regression_left.coef_, " And your intercept is: ", Lin_Regression_left.intercept_)
+
+# FOR RIGHT WHEEL
+Lin_Regression_right = LinearRegression()
+X_right = train.loc[:, full_list]
+y_right = train["Speed Right Wheel"]
+Lin_Regression_right.fit(X_right, y_right)
+
+print("FOR THE RIGHT WHEEL:", "Your coeffs: ", Lin_Regression_right.coef_, " And your intercept is: ", Lin_Regression_right.intercept_)
+
+
+# We can see that using only 2 inputs (i.e. second degree polynomial) gives bad predictions, so we made the model more complex by taking into account all available metrix.
+
+# In[243]:
+
+
+#  PREDICTED DATA
+y_simulated_left = Lin_Regression_left.predict(test.loc[:, full_list])
+y_simulated_right = Lin_Regression_right.predict(test.loc[:, full_list])
+len(y_actual_left) == len(y_actual_right) == len(pwm_left) == len(pwm_right) == len(y_simulated_left) == len(y_simulated_right)
+
+
+plt.plot(pwm_left, y_actual_left, 'b-', label='actual_velocity_left')
+plt.plot(pwm_left, y_simulated_left, '-o', label='simulated_velocity_left')
+plt.plot(pwm_right, y_actual_right, 'y-',  label='actual_velocity_right')
+plt.plot(pwm_right, y_simulated_right, 'o-', label='simulated_velocity_right')
+plt.xlabel("PWM", fontsize=18)
+plt.ylabel("Velocity of Wheels", fontsize=18)
+plt.title("Performance on unseen TEST data", fontsize=16)
+plt.legend()
+plt.show()
+# plt.legend(labels, loc=0)
+# plt.show()
+
+
+# When we take into account 6 measurements (with Period and Frequency being linearly dependent): 'Left Motor PWM', 'Left Frequency', 'Left Period (s)','Right Motor PWM','Right Frequency','Right Period (s)' we get really good prediction. Simulated and predicted speeds even have overlapping regions. 
+# 
+# """I split (randomly sample) the data @Yuci Shen and @Nathan March collected separately. 
+# And the final graph is model predicting velocities it never saw based on PWM, Frequency, and Period 
+# of left and right wheels ---> X has 6 columns 
+# and we have 2 models: one for Left Wheel and one for Right Wheel"""
+# 
+# ** It is really interesting how having both frequency and period gives better prediction than when using period only.
+# 
+# *** BECAUSE WE USE RANDOM SPLITS FOR TRAIN AND TEST DATA - EVERYTIME THE PLOTS LOOK SLIGHTLY DIFFERENT***
+
+# In[245]:
+
+
+"""I split (randomly sample) the data @Yuci Shen and @Nathan March collected separately. 
+And the final graph is model predicting velocities it never saw based on PWM, Frequency, and Period 
+of left and right wheels ---> X has 6 columns 
+and we have 2 models: one for Left Wheel and one for Right Wheel"""
+
+y_actual_left, y_actual_right = test["Speed Left Wheel"], test['Speed Right Wheel']
+
+plt.figure(figsize=(9, 7), dpi= 80, facecolor='w', edgecolor='k')
+plt.plot(pwm_left, y_actual_left, 'b-', label='actual_velocity_left')
+plt.plot(pwm_left, y_simulated_left, '-o', label='simulated_velocity_left')
+plt.plot(pwm_right, y_actual_right, 'o-',  label='actual_velocity_right')
+plt.plot(pwm_right, y_simulated_right, 'r-^', label='simulated_velocity_right')
+plt.xlabel("PWM", fontsize=18)
+plt.ylabel("Velocity of Wheels", fontsize=18)
+plt.title("Actual v. Predicted Velocities", fontsize=18)
+plt.legend()
+plt.show()
+
+
+# It looks like on HIGH and LOW PWM values our model makes nearly perfect prediction of the wheels' velocities, while UNDERESTIMATING for LEFT wheel and OVERESTIMATING for RIGHT wheel velocities.
+# 
+# Now let's plot ERROR as L2 loss = $sqrt(y_{actual} - y_{predicted})^2$
+
+# In[222]:
+
+
+import math
+y_actual_left.reset_index(drop=True, inplace=True)
+y_actual_right.reset_index(drop=True, inplace=True)
+diff_left = [y_actual_left[i]-y_simulated_left[i] for i in range(len(y_actual_right))]
+diff_right = [y_actual_right[i]-y_simulated_right[i] for i in range(len(y_actual_right))]
+L2_LOSS_LEFT = [math.sqrt(pow(diff_left[i], 2)) for i in range(len(y_actual_right))]
+L2_LOSS_RIGHT = [math.sqrt(pow(diff_right[i], 2)) for i in range(len(y_actual_right))]
+
+plt.figure(figsize=(9, 7), dpi= 80, facecolor='w', edgecolor='k')
+plt.plot(pwm_left, L2_LOSS_LEFT, 'o-', label='L2_LOSS_LEFT')
+plt.plot(pwm_right, L2_LOSS_RIGHT, '-o', label='L2_LOSS_RIGHT')
+plt.xlabel("PWM", fontsize=18)
+plt.ylabel("L2_LOSS", fontsize=18)
+plt.title("ERROR: PWM v. L2 Loss", fontsize=18)
+plt.legend()
+plt.show()
+
+print("L2_LOSS_LEFT = ", sum(L2_LOSS_LEFT), "L2_LOSS_RIGHT = ", sum(L2_LOSS_RIGHT))
+
+
+# Now let's ALSO plot ERROR as L1 loss = $abs|y_{actual} - y_{predicted}|$
+
+# In[223]:
+
+
+diff_left1 = [(y_actual_left[i]-y_simulated_left[i]) for i in range(len(y_actual_right))]
+diff_right1 = [(y_actual_right[i]-y_simulated_right[i]) for i in range(len(y_actual_right))]
+L1_LOSS_LEFT  = [np.absolute(diff_left1[i]) for i in range(len(y_actual_right))]
+L1_LOSS_RIGHT = [np.absolute(diff_right1[i]) for i in range(len(y_actual_right))]
+
+plt.plot(pwm_left, L1_LOSS_LEFT, 'o-', label='L2_LOSS_LEFT')
+plt.plot(pwm_right, L1_LOSS_RIGHT, '-o', label='L2_LOSS_RIGHT')
+plt.xlabel("PWM", fontsize=18)
+plt.ylabel("L1_LOSS", fontsize=18)
+plt.title("ERROR: PWM v. L1 Loss", fontsize=18)
+plt.legend()
+plt.show()
+
+print("L1_LOSS_LEFT = ", sum(L1_LOSS_LEFT), "L1_LOSS_RIGHT = ", sum(L1_LOSS_RIGHT))
+
+
+# $L2_{LOSS_.LEFT} = 1.8761279378055287, L2_{LOSS_.RIGHT} = 2.9992030935344296$
+# 
+# 
+# $L1_{LOSS_.LEFT} = 1.8761279378055287, L1_{LOSS_.RIGHT} = 2.9992030935344296$
+# 
+# This could be because our model is simple
+
+# It looks like on HIGH and LOW PWM values our model makes nearly perfect prediction of the wheels' velocities, while UNDERESTIMATING for LEFT wheel and OVERESTIMATING for RIGHT wheel velocities.
+# 
+# Now let's plot ERROR as L2 loss = $sqrt(y_{actual} - y_{predicted})^2$
+
+# In[224]:
+
+
+# extracting parameters, still we will use simpler model from above for now
+theta_left, beta_left = -1.14978406e-02,  1.82203795e-03
+theta_right, beta_right = 7.99460365e-03, -1.36993882e-04
+
+
+# In[225]:
+
+
+# plot results of least squares fit 
+y_left_LS, y_right_LS = y_simulated_left, y_simulated_right
+pwm_left.reset_index(drop=True, inplace=True)
+pwm_right.reset_index(drop=True, inplace=True)
+u = [[int(pwm_left[i]), int(pwm_right[i])] for i in range(len(y_left_LS))]
+pwm_l = np.array([int(pwm_left[i]) for i in range(len(pwm_left))])
+
+# u = np.array(u).reshape(-1)
+u
+vleft_LS = theta_left*pwm_l.T - beta_left
+
+
+# In[232]:
+
+
+pwm_r = np.array([int(pwm_right[i]) for i in range(len(pwm_right))])
+vright_LS = theta_right*pwm_r.T-beta_right
+
+#Shifted for RIGHT WHEEL to avoid OVERPLOTTING
+plt.plot(pwm_l.T, y_actual_left, 'bo', label='actual_velocity_left')
+plt.plot(pwm_l.T, vleft_LS, 'yo', label='simulated_velocity_left')
+plt.plot(pwm_r.T, y_actual_right, 'r-', label='actual_velocity_right')
+plt.plot(pwm_r.T, vright_LS, 'g-', label='simulated_velocity_right')
+plt.xlabel("u (input via PWM)")
+plt.ylabel("Velocity of Wheels")
+plt.title("Actual v. Predicted", fontsize=14)
+plt.legend()
+plt.show()
+
+
+# It looks like on HIGH and LOW PWM values our model makes nearly perfect prediction of the wheels' velocities, while UNDERESTIMATING for LEFT wheel and OVERESTIMATING for RIGHT wheel velocities.
+# 
+# Now let's plot ERROR as L2 loss = $sqrt(y_{actual} - y_{predicted})^2$
+
+# To test that we have estimated the parameters accurately, we will simulate the model using the parameters we have found. When we compare the simulated data with the collected data, we expect them to match up pretty well.
+
+# In[233]:
+
+
+# model for simulation 
+def simulation(d0, u, theta, beta):
+    d = np.zeros(len(u)+1)
+#     d[0] = d0
+    for t in range(len(u)):
+        d[t+1] = d[t] + theta*u[t] - beta
+    return d
+        
+# plot simulated trajectories 
+u = pwm_l.T
+dleft_simulated  = simulation(y_actual_left, u, theta_left, beta_left)
+dright_simulated = simulation(y_actual_right, u, theta_right, beta_right)
+plt.plot(y_actual_left, 'b.', 
+         y_actual_right, 'y.',
+         dleft_simulated, 'b-', 
+         dright_simulated, 'y-',
+        )
+plt.xlabel("time")
+plt.ylabel("distance")
+plt.legend(("left (data)", "right (data)", "left (fit)", "right (fit)"), loc='upper left')
+
+
+# In order to drive straight, the car must be operating at a velocity achievable by both wheels. 
+# A good choice of target velocity is the midpoint of the overlapping range of velocity. 
+# The below cell will calculate this. Green area in between 2 green lines is the optimal speed - in theory.
+
+# In[58]:
+
+
+# This is from my old notes from Signal & Systems course I took in the past
+
+min_vel = max(min(vleft_LS), min(vright_LS))
+max_vel = min(max(vleft_LS), max(vright_LS))
+print('Velocity range = [{:0.1f}, {:0.1f}]'.format(min_vel, max_vel))
+midpoint = (min_vel+max_vel)/2
+print('\nOperating point:\nv_star = {:.1f};'.format(midpoint))
+
+u = u.reshape(-1)
+vleft_LS = theta_left*u-beta_left
+vright_LS = theta_right*u-beta_right
+plt.plot(u, vleft_LS, 'b-', u, vright_LS, 'y-')
+for i in (min_vel, max_vel):
+    plt.plot(u, 0*u + i, 'g-')
+plt.plot(u, dleft_simulated[1:], 'bo',  u, dright_simulated[1:], 'yo')
+plt.xlabel("u (input via PWM)")
+plt.ylabel("Velocity of Wheels")
+plt.legend(("left", "right", "overlap"), loc=0)
+
+
+# Hence: Optimal VELOCITY RANGE = [0.8, -1.1]
+# 
+# Operating point:
+# v_star = -0.2;
+
+# In[ ]:
+
+
+
+
